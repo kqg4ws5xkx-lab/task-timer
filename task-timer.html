@@ -136,6 +136,18 @@
   }
   .delete-btn:hover { color: #E05757; }
 
+  .task-end-time {
+    font-size: 12px;
+    color: #AAA;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+    min-width: 36px;
+    text-align: right;
+  }
+  .task-end-time.filled {
+    color: #888;
+  }
+
   /* 追加ボタン */
   .add-btn {
     width: 100%;
@@ -284,6 +296,7 @@
         <input class="task-min" type="number" placeholder="0" min="0" max="999" value="${task.min}"
           oninput="updateTask(${task.id}, 'min', this.value)">
         <span class="min-label">分</span>
+        <span class="task-end-time" id="end-${task.id}">--:--</span>
         <button class="delete-btn" onclick="removeTask(${task.id})">×</button>
       `;
       list.appendChild(row);
