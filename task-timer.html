@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>いつ終わる？</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #F7F5F2;
+    font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 60px;
+  }
+
+  h1 {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    color: #999;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+
+  /* 終了時刻の大きな表示 */
+  .result-block {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .result-label {
+    font-size: 12px;
+    color: #999;
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+  }
+
+  .result-time {
+    font-size: 72px;
+    font-weight: 700;
+    color: #1A1A1A;
+    line-height: 1;
+    letter-spacing: -2px;
+    font-variant-numeric: tabular-nums;
+    transition: all 0.3s ease;
+  }
+
+  .result-time.empty {
+    color: #CCC;
+  }
+
+  .result-sub {
+    font-size: 13px;
+    color: #888;
+    margin-top: 10px;
+    min-height: 20px;
+  }
+
+  /* タスクリスト */
+  .task-list {
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .task-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    animation: slideIn 0.18s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .task-name {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    font-family: inherit;
+    color: #1A1A1A;
+    background: transparent;
+    placeholder-color: #CCC;
+  }
+
+  .task-name::placeholder { color: #CCC; }
+
+  .separator {
+    font-size: 13px;
+    color: #CCC;
+    flex-shrink: 0;
+  }
+
+  .task-min {
+    width: 56px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    font-family: inherit;
+    font-variant-numeric: tabular-nums;
+    color: #1A1A1A;
+    background: transparent;
+    text-align: right;
+  }
+
+  .min-label {
+    font-size: 12px;
+    color: #AAA;
+    flex-shrink: 0;
+  }
+
+  .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #CCC;
+    font-size: 18px;
+    line-height: 1;
+    padding: 2px 4px;
+    transition: color 0.15s;
+    flex-shrink: 0;
+  }
+  .delete-btn:hover { color: #E05757; }
+
+  /* 追加ボタン */
+  .add-btn {
+    width: 100%;
+    max-width: 440px;
+    padding: 13px;
+    background: transparent;
+    border: 1.5px dashed #D8D5D0;
+    border-radius: 12px;
+    font-size: 14px;
+    color: #AAA;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 0.05em;
+    transition: all 0.15s;
+  }
+  .add-btn:hover {
+    border-color: #BBBBBB;
+    color: #777;
+    background: #FAFAFA;
+  }
+
+  /* 開始時刻 */
+  .start-row {
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 24px;
+    padding: 0 4px;
+  }
+
+  .start-label {
+    font-size: 12px;
+    color: #AAA;
+    letter-spacing: 0.1em;
+  }
+
+  .start-input {
+    border: none;
+    outline: none;
+    font-size: 14px;
+    font-family: inherit;
+    font-variant-numeric: tabular-nums;
+    color: #555;
+    background: transparent;
+    text-align: right;
+    cursor: pointer;
+  }
+
+  .now-btn {
+    background: none;
+    border: 1px solid #DDD;
+    border-radius: 6px;
+    font-size: 11px;
+    color: #999;
+    padding: 3px 8px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-left: 8px;
+    transition: all 0.15s;
+  }
+  .now-btn:hover { border-color: #999; color: #555; }
+
+  /* 合計表示 */
+  .total-row {
+    width: 100%;
+    max-width: 440px;
+    text-align: right;
+    font-size: 12px;
+    color: #BBB;
+    margin-top: 10px;
+    padding: 0 4px;
+    font-variant-numeric: tabular-nums;
+    min-height: 18px;
+  }
+</style>
+</head>
+<body>
+
+<h1>いつ終わる？</h1>
+
+<div class="result-block">
+  <div class="result-label">終了時刻</div>
+  <div class="result-time empty" id="resultTime">--:--</div>
+  <div class="result-sub" id="resultSub"></div>
+</div>
+
+<div class="task-list" id="taskList"></div>
+
+<button class="add-btn" onclick="addTask()">+ タスクを追加</button>
+
+<div class="start-row">
+  <span class="start-label">開始時刻</span>
+  <div style="display:flex;align-items:center;gap:6px">
+    <button class="now-btn" onclick="setNow()">今</button>
+    <input type="time" class="start-input" id="startTime">
+  </div>
+</div>
+
+<div class="total-row" id="totalRow"></div>
+
+<script>
+  let tasks = [];
+  let idCounter = 0;
+
+  function getCurrentTime() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    return `${h}:${m}`;
+  }
+
+  function setNow() {
+    document.getElementById('startTime').value = getCurrentTime();
+    recalc();
+  }
+
+  function addTask() {
+    const id = idCounter++;
+    tasks.push({ id, name: '', min: '' });
+    renderTasks();
+    // 最後の名前フィールドにフォーカス
+    setTimeout(() => {
+      const inputs = document.querySelectorAll('.task-name');
+      if (inputs.length) inputs[inputs.length - 1].focus();
+    }, 30);
+  }
+
+  function removeTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    renderTasks();
+    recalc();
+  }
+
+  function renderTasks() {
+    const list = document.getElementById('taskList');
+    list.innerHTML = '';
+    tasks.forEach(task => {
+      const row = document.createElement('div');
+      row.className = 'task-row';
+      row.innerHTML = `
+        <input class="task-name" type="text" placeholder="タスク名" value="${escHtml(task.name)}"
+          oninput="updateTask(${task.id}, 'name', this.value)">
+        <span class="separator">|</span>
+        <input class="task-min" type="number" placeholder="0" min="0" max="999" value="${task.min}"
+          oninput="updateTask(${task.id}, 'min', this.value)">
+        <span class="min-label">分</span>
+        <button class="delete-btn" onclick="removeTask(${task.id})">×</button>
+      `;
+      list.appendChild(row);
+    });
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function updateTask(id, field, value) {
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+      task[field] = value;
+      recalc();
+    }
+  }
+
+  function recalc() {
+    const startVal = document.getElementById('startTime').value;
+    const totalMinutes = tasks.reduce((sum, t) => sum + (parseInt(t.min) || 0), 0);
+
+    const totalEl = document.getElementById('totalRow');
+    totalEl.textContent = totalMinutes > 0 ? `合計 ${totalMinutes} 分` : '';
+
+    const resultTimeEl = document.getElementById('resultTime');
+    const resultSubEl = document.getElementById('resultSub');
+
+    if (!startVal || totalMinutes === 0) {
+      resultTimeEl.textContent = '--:--';
+      resultTimeEl.classList.add('empty');
+      resultSubEl.textContent = '';
+      return;
+    }
+
+    const [sh, sm] = startVal.split(':').map(Number);
+    const startMins = sh * 60 + sm;
+    const endMins = startMins + totalMinutes;
+    const endH = Math.floor(endMins / 60) % 24;
+    const endM = endMins % 60;
+    const endStr = `${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
+
+    resultTimeEl.textContent = endStr;
+    resultTimeEl.classList.remove('empty');
+
+    // 今との差
+    const now = new Date();
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+    const diff = endMins - nowMins;
+    if (diff > 0) {
+      const dh = Math.floor(diff / 60);
+      const dm = diff % 60;
+      if (dh > 0) {
+        resultSubEl.textContent = `今から ${dh} 時間 ${dm} 分後`;
+      } else {
+        resultSubEl.textContent = `今から ${dm} 分後`;
+      }
+    } else if (diff === 0) {
+      resultSubEl.textContent = 'ちょうど今';
+    } else {
+      resultSubEl.textContent = '';
+    }
+  }
+
+  // 初期化
+  document.getElementById('startTime').value = getCurrentTime();
+  document.getElementById('startTime').addEventListener('change', recalc);
+
+  // 最初のタスクを1件追加
+  addTask();
+</script>
+</body>
+</html>
