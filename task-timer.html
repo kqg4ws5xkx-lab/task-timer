@@ -14,7 +14,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 40px 20px 60px;
+    padding: 40px 20px 80px;
   }
 
   h1 {
@@ -22,23 +22,20 @@
     font-weight: 500;
     letter-spacing: 0.2em;
     color: #999;
-    text-transform: uppercase;
     margin-bottom: 40px;
   }
 
-  /* 終了時刻の大きな表示 */
+  /* 終了時刻 */
   .result-block {
     text-align: center;
     margin-bottom: 48px;
   }
-
   .result-label {
     font-size: 12px;
     color: #999;
     letter-spacing: 0.15em;
     margin-bottom: 8px;
   }
-
   .result-time {
     font-size: 72px;
     font-weight: 700;
@@ -48,11 +45,7 @@
     font-variant-numeric: tabular-nums;
     transition: all 0.3s ease;
   }
-
-  .result-time.empty {
-    color: #CCC;
-  }
-
+  .result-time.empty { color: #CCC; }
   .result-sub {
     font-size: 13px;
     color: #888;
@@ -66,25 +59,83 @@
     max-width: 440px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 16px;
+    gap: 8px;
+    margin-bottom: 12px;
   }
 
   .task-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     background: #fff;
     border-radius: 12px;
-    padding: 12px 14px;
+    padding: 10px 12px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    animation: slideIn 0.18s ease;
+    transition: opacity 0.2s, box-shadow 0.2s;
+    cursor: default;
+    user-select: none;
+  }
+  .task-row.done {
+    opacity: 0.45;
+  }
+  .task-row.done .task-name-text {
+    text-decoration: line-through;
+    color: #AAA;
+  }
+  .task-row.dragging {
+    opacity: 0.4;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  }
+  .task-row.drag-over {
+    box-shadow: 0 0 0 2px #BBBBBB;
   }
 
   @keyframes slideIn {
     from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+
+  /* チェックボックス */
+  .check-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid #DDD;
+    background: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    padding: 0;
+  }
+  .check-btn:hover { border-color: #AAA; }
+  .check-btn.checked {
+    background: #D4D0CB;
+    border-color: #D4D0CB;
+  }
+  .check-btn.checked::after {
+    content: '';
+    width: 5px;
+    height: 9px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translateY(-1px);
+  }
+
+  /* ドラッグハンドル */
+  .drag-handle {
+    color: #CCC;
+    font-size: 14px;
+    cursor: grab;
+    flex-shrink: 0;
+    padding: 0 2px;
+    line-height: 1;
+    touch-action: none;
+  }
+  .drag-handle:active { cursor: grabbing; }
 
   .task-name {
     flex: 1;
@@ -94,19 +145,19 @@
     font-family: inherit;
     color: #1A1A1A;
     background: transparent;
-    placeholder-color: #CCC;
+    min-width: 0;
+    cursor: text;
   }
-
   .task-name::placeholder { color: #CCC; }
 
   .separator {
     font-size: 13px;
-    color: #CCC;
+    color: #DDD;
     flex-shrink: 0;
   }
 
   .task-min {
-    width: 56px;
+    width: 48px;
     border: none;
     outline: none;
     font-size: 15px;
@@ -123,30 +174,28 @@
     flex-shrink: 0;
   }
 
+  .task-end-time {
+    font-size: 12px;
+    color: #CCC;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+    min-width: 34px;
+    text-align: right;
+  }
+  .task-end-time.filled { color: #999; }
+
   .delete-btn {
     background: none;
     border: none;
     cursor: pointer;
-    color: #CCC;
-    font-size: 18px;
+    color: #DDD;
+    font-size: 16px;
     line-height: 1;
-    padding: 2px 4px;
+    padding: 2px 2px;
     transition: color 0.15s;
     flex-shrink: 0;
   }
   .delete-btn:hover { color: #E05757; }
-
-  .task-end-time {
-    font-size: 12px;
-    color: #AAA;
-    font-variant-numeric: tabular-nums;
-    flex-shrink: 0;
-    min-width: 36px;
-    text-align: right;
-  }
-  .task-end-time.filled {
-    color: #888;
-  }
 
   /* 追加ボタン */
   .add-btn {
@@ -163,11 +212,7 @@
     letter-spacing: 0.05em;
     transition: all 0.15s;
   }
-  .add-btn:hover {
-    border-color: #BBBBBB;
-    color: #777;
-    background: #FAFAFA;
-  }
+  .add-btn:hover { border-color: #BBB; color: #777; background: #FAFAFA; }
 
   /* 開始時刻 */
   .start-row {
@@ -176,16 +221,14 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 24px;
+    margin-top: 20px;
     padding: 0 4px;
   }
-
   .start-label {
     font-size: 12px;
     color: #AAA;
     letter-spacing: 0.1em;
   }
-
   .start-input {
     border: none;
     outline: none;
@@ -197,7 +240,6 @@
     text-align: right;
     cursor: pointer;
   }
-
   .now-btn {
     background: none;
     border: 1px solid #DDD;
@@ -212,17 +254,155 @@
   }
   .now-btn:hover { border-color: #999; color: #555; }
 
-  /* 合計表示 */
+  /* 合計 */
   .total-row {
     width: 100%;
     max-width: 440px;
     text-align: right;
     font-size: 12px;
     color: #BBB;
-    margin-top: 10px;
+    margin-top: 8px;
     padding: 0 4px;
     font-variant-numeric: tabular-nums;
     min-height: 18px;
+  }
+
+  /* 区切り */
+  .divider {
+    width: 100%;
+    max-width: 440px;
+    border: none;
+    border-top: 1px solid #EAE8E4;
+    margin: 24px 0 20px;
+  }
+
+  /* よく使うタスク */
+  .preset-section {
+    width: 100%;
+    max-width: 440px;
+  }
+  .preset-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 0 2px;
+  }
+  .preset-title {
+    font-size: 12px;
+    color: #AAA;
+    letter-spacing: 0.1em;
+  }
+  .preset-add-btn {
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: #AAA;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: all 0.15s;
+  }
+  .preset-add-btn:hover { color: #555; background: #EEE; }
+
+  .preset-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .preset-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
+    border: 1px solid #E8E5E0;
+    border-radius: 20px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .preset-chip:hover {
+    border-color: #BBB;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+  .preset-chip-name {
+    font-size: 13px;
+    color: #444;
+  }
+  .preset-chip-min {
+    font-size: 11px;
+    color: #AAA;
+    font-variant-numeric: tabular-nums;
+  }
+  .preset-chip-del {
+    background: none;
+    border: none;
+    color: #CCC;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    margin-left: 2px;
+    transition: color 0.15s;
+  }
+  .preset-chip-del:hover { color: #E05757; }
+
+  /* プリセット追加フォーム */
+  .preset-form {
+    display: none;
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    margin-top: 12px;
+    gap: 10px;
+    align-items: center;
+  }
+  .preset-form.open { display: flex; }
+  .preset-form-name {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    font-family: inherit;
+    color: #1A1A1A;
+    background: transparent;
+  }
+  .preset-form-name::placeholder { color: #CCC; }
+  .preset-form-min {
+    width: 44px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    font-family: inherit;
+    font-variant-numeric: tabular-nums;
+    color: #1A1A1A;
+    background: transparent;
+    text-align: right;
+  }
+  .preset-form-save {
+    background: #1A1A1A;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-family: inherit;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .preset-form-save:hover { opacity: 0.75; }
+  .preset-form-cancel {
+    background: none;
+    border: none;
+    color: #AAA;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 6px 4px;
   }
 </style>
 </head>
@@ -237,7 +417,6 @@
 </div>
 
 <div class="task-list" id="taskList"></div>
-
 <button class="add-btn" onclick="addTask()">+ タスクを追加</button>
 
 <div class="start-row">
@@ -247,18 +426,40 @@
     <input type="time" class="start-input" id="startTime">
   </div>
 </div>
-
 <div class="total-row" id="totalRow"></div>
+
+<hr class="divider">
+
+<div class="preset-section">
+  <div class="preset-header">
+    <span class="preset-title">よく使うタスク</span>
+    <button class="preset-add-btn" onclick="togglePresetForm()">＋ 追加</button>
+  </div>
+  <div class="preset-list" id="presetList"></div>
+  <div class="preset-form" id="presetForm">
+    <input class="preset-form-name" id="presetName" type="text" placeholder="タスク名">
+    <span class="separator">|</span>
+    <input class="preset-form-min" id="presetMin" type="number" placeholder="0" min="1" max="999">
+    <span class="min-label">分</span>
+    <button class="preset-form-save" onclick="savePreset()">保存</button>
+    <button class="preset-form-cancel" onclick="togglePresetForm()">キャンセル</button>
+  </div>
+</div>
 
 <script>
   let tasks = [];
   let idCounter = 0;
+  let presets = JSON.parse(localStorage.getItem('presets') || '[]');
 
+  // ---- 時間ユーティリティ ----
   function getCurrentTime() {
     const now = new Date();
-    const h = String(now.getHours()).padStart(2, '0');
-    const m = String(now.getMinutes()).padStart(2, '0');
-    return `${h}:${m}`;
+    return `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  }
+  function minsToStr(mins) {
+    const h = Math.floor(mins / 60) % 24;
+    const m = mins % 60;
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
   }
 
   function setNow() {
@@ -266,15 +467,18 @@
     recalc();
   }
 
-  function addTask() {
+  // ---- タスク操作 ----
+  function addTask(name='', min='') {
     const id = idCounter++;
-    tasks.push({ id, name: '', min: '' });
+    tasks.push({ id, name, min: min ? String(min) : '', done: false });
     renderTasks();
-    // 最後の名前フィールドにフォーカス
-    setTimeout(() => {
-      const inputs = document.querySelectorAll('.task-name');
-      if (inputs.length) inputs[inputs.length - 1].focus();
-    }, 30);
+    if (!name) {
+      setTimeout(() => {
+        const inputs = document.querySelectorAll('.task-name');
+        if (inputs.length) inputs[inputs.length - 1].focus();
+      }, 30);
+    }
+    recalc();
   }
 
   function removeTask(id) {
@@ -283,17 +487,136 @@
     recalc();
   }
 
+  function toggleDone(id) {
+    const t = tasks.find(t => t.id === id);
+    if (t) { t.done = !t.done; renderTasks(); recalc(); }
+  }
+
+  function updateTask(id, field, value) {
+    const t = tasks.find(t => t.id === id);
+    if (t) { t[field] = value; recalc(); }
+  }
+
+  // ---- ドラッグ＆ドロップ ----
+  let dragSrcId = null;
+
+  function onDragStart(e, id) {
+    dragSrcId = id;
+    setTimeout(() => {
+      const el = document.querySelector(`[data-id="${id}"]`);
+      if (el) el.classList.add('dragging');
+    }, 0);
+    e.dataTransfer.effectAllowed = 'move';
+  }
+
+  function onDragOver(e, id) {
+    e.preventDefault();
+    document.querySelectorAll('.task-row').forEach(r => r.classList.remove('drag-over'));
+    const el = document.querySelector(`[data-id="${id}"]`);
+    if (el && id !== dragSrcId) el.classList.add('drag-over');
+  }
+
+  function onDrop(e, id) {
+    e.preventDefault();
+    if (dragSrcId === null || dragSrcId === id) return;
+    const srcIdx = tasks.findIndex(t => t.id === dragSrcId);
+    const dstIdx = tasks.findIndex(t => t.id === id);
+    const [moved] = tasks.splice(srcIdx, 1);
+    tasks.splice(dstIdx, 0, moved);
+    renderTasks();
+    recalc();
+  }
+
+  function onDragEnd() {
+    dragSrcId = null;
+    document.querySelectorAll('.task-row').forEach(r => {
+      r.classList.remove('dragging', 'drag-over');
+    });
+  }
+
+  // タッチ用ドラッグ
+  let touchDragId = null;
+  let touchClone = null;
+  let touchOffsetY = 0;
+
+  function onTouchStart(e, id) {
+    touchDragId = id;
+    const touch = e.touches[0];
+    const row = document.querySelector(`[data-id="${id}"]`);
+    const rect = row.getBoundingClientRect();
+    touchOffsetY = touch.clientY - rect.top;
+    touchClone = row.cloneNode(true);
+    touchClone.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;opacity:0.85;pointer-events:none;z-index:9999;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.15);`;
+    document.body.appendChild(touchClone);
+    row.style.opacity = '0.3';
+  }
+
+  function onTouchMove(e) {
+    if (touchDragId === null) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    if (touchClone) {
+      touchClone.style.top = `${touch.clientY - touchOffsetY}px`;
+    }
+    document.querySelectorAll('.task-row').forEach(r => r.classList.remove('drag-over'));
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const row = el ? el.closest('.task-row') : null;
+    if (row) {
+      const overId = parseInt(row.dataset.id);
+      if (overId !== touchDragId) row.classList.add('drag-over');
+    }
+  }
+
+  function onTouchEnd(e) {
+    if (touchDragId === null) return;
+    const touch = e.changedTouches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const row = el ? el.closest('.task-row') : null;
+    if (row) {
+      const dstId = parseInt(row.dataset.id);
+      if (dstId !== touchDragId) {
+        const srcIdx = tasks.findIndex(t => t.id === touchDragId);
+        const dstIdx = tasks.findIndex(t => t.id === dstId);
+        const [moved] = tasks.splice(srcIdx, 1);
+        tasks.splice(dstIdx, 0, moved);
+      }
+    }
+    if (touchClone) { touchClone.remove(); touchClone = null; }
+    touchDragId = null;
+    renderTasks();
+    recalc();
+  }
+
+  document.addEventListener('touchmove', onTouchMove, { passive: false });
+  document.addEventListener('touchend', onTouchEnd);
+
+  // ---- レンダリング ----
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
   function renderTasks() {
     const list = document.getElementById('taskList');
     list.innerHTML = '';
     tasks.forEach(task => {
       const row = document.createElement('div');
-      row.className = 'task-row';
+      row.className = 'task-row' + (task.done ? ' done' : '');
+      row.dataset.id = task.id;
+      row.draggable = true;
+      row.addEventListener('dragstart', e => onDragStart(e, task.id));
+      row.addEventListener('dragover',  e => onDragOver(e, task.id));
+      row.addEventListener('drop',      e => onDrop(e, task.id));
+      row.addEventListener('dragend',   onDragEnd);
+
       row.innerHTML = `
+        <div class="drag-handle" 
+          ontouchstart="onTouchStart(event, ${task.id})"
+        >⠿</div>
+        <button class="check-btn ${task.done ? 'checked' : ''}" onclick="toggleDone(${task.id})"></button>
         <input class="task-name" type="text" placeholder="タスク名" value="${escHtml(task.name)}"
           oninput="updateTask(${task.id}, 'name', this.value)">
         <span class="separator">|</span>
-        <input class="task-min" type="number" placeholder="0" min="0" max="999" value="${task.min}"
+        <input class="task-min" type="number" placeholder="0" min="0" max="999" value="${escHtml(task.min)}"
           oninput="updateTask(${task.id}, 'min', this.value)">
         <span class="min-label">分</span>
         <span class="task-end-time" id="end-${task.id}">--:--</span>
@@ -303,27 +626,23 @@
     });
   }
 
-  function escHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  function updateTask(id, field, value) {
-    const task = tasks.find(t => t.id === id);
-    if (task) {
-      task[field] = value;
-      recalc();
-    }
-  }
-
+  // ---- 計算 ----
   function recalc() {
     const startVal = document.getElementById('startTime').value;
-    const totalMinutes = tasks.reduce((sum, t) => sum + (parseInt(t.min) || 0), 0);
+    const activeTasks = tasks.filter(t => !t.done);
+    const totalMinutes = activeTasks.reduce((sum, t) => sum + (parseInt(t.min) || 0), 0);
 
-    const totalEl = document.getElementById('totalRow');
-    totalEl.textContent = totalMinutes > 0 ? `合計 ${totalMinutes} 分` : '';
+    document.getElementById('totalRow').textContent =
+      totalMinutes > 0 ? `合計 ${totalMinutes} 分` : '';
 
     const resultTimeEl = document.getElementById('resultTime');
-    const resultSubEl = document.getElementById('resultSub');
+    const resultSubEl  = document.getElementById('resultSub');
+
+    // 全タスクの終了時刻リセット
+    tasks.forEach(t => {
+      const el = document.getElementById(`end-${t.id}`);
+      if (el) { el.textContent = '--:--'; el.classList.remove('filled'); }
+    });
 
     if (!startVal || totalMinutes === 0) {
       resultTimeEl.textContent = '--:--';
@@ -333,27 +652,28 @@
     }
 
     const [sh, sm] = startVal.split(':').map(Number);
-    const startMins = sh * 60 + sm;
-    const endMins = startMins + totalMinutes;
-    const endH = Math.floor(endMins / 60) % 24;
-    const endM = endMins % 60;
-    const endStr = `${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
+    let cumMins = sh * 60 + sm;
 
-    resultTimeEl.textContent = endStr;
+    tasks.forEach(t => {
+      if (t.done) return;
+      cumMins += (parseInt(t.min) || 0);
+      const el = document.getElementById(`end-${t.id}`);
+      if (el && parseInt(t.min) > 0) {
+        el.textContent = minsToStr(cumMins);
+        el.classList.add('filled');
+      }
+    });
+
+    resultTimeEl.textContent = minsToStr(cumMins);
     resultTimeEl.classList.remove('empty');
 
-    // 今との差
     const now = new Date();
     const nowMins = now.getHours() * 60 + now.getMinutes();
-    const diff = endMins - nowMins;
+    const diff = cumMins - nowMins;
     if (diff > 0) {
       const dh = Math.floor(diff / 60);
       const dm = diff % 60;
-      if (dh > 0) {
-        resultSubEl.textContent = `今から ${dh} 時間 ${dm} 分後`;
-      } else {
-        resultSubEl.textContent = `今から ${dm} 分後`;
-      }
+      resultSubEl.textContent = dh > 0 ? `今から ${dh} 時間 ${dm} 分後` : `今から ${dm} 分後`;
     } else if (diff === 0) {
       resultSubEl.textContent = 'ちょうど今';
     } else {
@@ -361,12 +681,62 @@
     }
   }
 
-  // 初期化
+  // ---- プリセット ----
+  function savePresets() {
+    localStorage.setItem('presets', JSON.stringify(presets));
+  }
+
+  function renderPresets() {
+    const list = document.getElementById('presetList');
+    list.innerHTML = '';
+    presets.forEach((p, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'preset-chip';
+      chip.innerHTML = `
+        <span class="preset-chip-name">${escHtml(p.name)}</span>
+        <span class="preset-chip-min">${p.min}分</span>
+        <button class="preset-chip-del" onclick="deletePreset(event, ${i})">×</button>
+      `;
+      chip.addEventListener('click', (e) => {
+        if (e.target.classList.contains('preset-chip-del')) return;
+        addTask(p.name, p.min);
+      });
+      list.appendChild(chip);
+    });
+  }
+
+  function togglePresetForm() {
+    const form = document.getElementById('presetForm');
+    form.classList.toggle('open');
+    if (form.classList.contains('open')) {
+      document.getElementById('presetName').focus();
+    }
+  }
+
+  function savePreset() {
+    const name = document.getElementById('presetName').value.trim();
+    const min  = parseInt(document.getElementById('presetMin').value);
+    if (!name || !min) return;
+    presets.push({ name, min });
+    savePresets();
+    renderPresets();
+    document.getElementById('presetName').value = '';
+    document.getElementById('presetMin').value = '';
+    togglePresetForm();
+  }
+
+  function deletePreset(e, i) {
+    e.stopPropagation();
+    presets.splice(i, 1);
+    savePresets();
+    renderPresets();
+  }
+
+  // ---- 初期化 ----
   document.getElementById('startTime').value = getCurrentTime();
   document.getElementById('startTime').addEventListener('change', recalc);
-
-  // 最初のタスクを1件追加
   addTask();
+  renderPresets();
 </script>
 </body>
 </html>
